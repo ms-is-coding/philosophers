@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 02:42:53 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 05:02:05 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:19:18 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,10 @@ void	time_sleep(t_sim *sim, int32_t time_ms)
 
 int	await_active(t_philo *philo)
 {
-	while (!philo->sim->active)
+	while (1)
 	{
+		if (philo->sim->active)
+			break ;
 		if (philo->sim->should_end)
 			return (-1);
 		usleep(100);

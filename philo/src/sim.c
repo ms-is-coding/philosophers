@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:06:32 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 04:36:45 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:18:39 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,7 @@ void	sim_cleanup(t_sim *sim)
 	int	i;
 
 	i = -1;
-	sim->active = 0;
-	sim->should_end = 1;
+	sim->active = false;
 	while (++i < sim->philo_count)
 	{
 		if (sim->philos[i].started)
@@ -37,7 +36,6 @@ void	sim_cleanup(t_sim *sim)
 	}
 	free(sim->philos);
 	free(sim->forks);
-	pthread_mutex_destroy(&sim->main_lock);
 }
 
 static void	assign_forks(t_sim *sim, int i)
@@ -77,25 +75,15 @@ static int	philo_init(t_sim *sim, int i)
 	return (0);
 }
 
-static int	init_main_locks(t_sim *sim)
-{
-	if (pthread_mutex_init(&sim->main_lock, 0) != 0)
-	{
-		printf("Mutex init failed\n");
-		return (-1);
-	}
-	return (0);
-}
-
 int	sim_init(t_sim *sim)
 {
 	int32_t	i;
 
 	sim->philos = malloc((size_t)sim->philo_count * sizeof(t_philo));
 	sim->forks = malloc((size_t)sim->philo_count * sizeof(t_fork));
-	if (!sim->philos || !sim->forks || init_main_locks(sim) == -1)
+	if (!sim->philos || !sim->forks)
 	{
-		printf("Memory allocation failed\n");
+		printf("Initialization failed\n");
 		free(sim->philos);
 		free(sim->forks);
 		return (-1);
@@ -103,15 +91,11 @@ int	sim_init(t_sim *sim)
 	i = -1;
 	memset(sim->philos, 0, (size_t)sim->philo_count * sizeof(t_philo));
 	memset(sim->forks, 0, (size_t)sim->philo_count * sizeof(t_fork));
-	while (++i < sim->philo_count)
-	{
-		if (philo_init(sim, i) != 0)
-		{
-			sim_cleanup(sim);
-			return (-1);
-		}
-	}
 	sim->start_time = time_now();
-	sim->active = 1;
+	sim->active = false;
+	while (++i < sim->philo_count)
+		if (philo_init(sim, i) != 0)
+			return (sim_cleanup(sim), -1);
+	sim->active = true;
 	return (0);
 }
