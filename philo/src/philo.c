@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:14:22 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:29:03 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:33:52 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@ static void	philo_eat_meal(t_philo *philo, t_fork *first, t_fork *second)
 	pthread_mutex_lock(&first->lock);
 	pthread_mutex_lock(&second->lock);
 	if (philo->sim->active)
-	{
 		printf("%li %i has taken a fork\n", timestamp(philo->sim), philo->id);
+	if (philo->sim->active)
 		printf("%li %i has taken a fork\n", timestamp(philo->sim), philo->id);
+	if (philo->sim->active)
 		printf("%li %i is eating\n", timestamp(philo->sim), philo->id);
-	}
 	philo->last_meal = time_now();
 	time_sleep(philo->sim, philo->sim->eat_time);
 	philo->meal_count++;
