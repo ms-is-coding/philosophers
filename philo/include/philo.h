@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 19:41:00 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:21:15 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:46:36 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ typedef struct s_sim
 {
 	t_philo				*philos;
 	t_fork				*forks;
+	pthread_mutex_t		io_lock;
 	int64_t				start_time;
 	int32_t				philo_count;
 	int32_t				death_time;
@@ -55,6 +56,7 @@ typedef struct s_sim
 	char				padding[6];
 }	t_sim;
 
+void	philo_print(t_philo *philo, const char *message);
 void	*philo_main(void *arg);
 int		sim_init(t_sim *sim);
 void	sim_cleanup(t_sim *sim);

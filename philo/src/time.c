@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 02:42:53 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:27:06 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:49:20 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int	await_active(t_philo *philo)
 			break ;
 		if (philo->sim->should_end)
 			return (-1);
-		usleep(100);
+		usleep(10);
 	}
 	philo->last_meal = time_now();
 	return (0);

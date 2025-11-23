@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 19:41:27 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:30:24 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:50:06 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,14 @@ static void	sim_monitor(t_sim *sim)
 		}
 		usleep(100);
 	}
+}
+
+void	philo_print(t_philo *philo, const char *message)
+{
+	pthread_mutex_lock(&philo->sim->io_lock);
+	if (philo->sim->active)
+		printf("%li %i %s\n", timestamp(philo->sim), philo->id, message);
+	pthread_mutex_unlock(&philo->sim->io_lock);
 }
 
 int	main(int argc, char **argv)

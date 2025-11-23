@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:14:22 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:33:52 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:48:26 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,10 @@
 static void	philo_eat_meal(t_philo *philo, t_fork *first, t_fork *second)
 {
 	pthread_mutex_lock(&first->lock);
+	philo_print(philo, "has taken a fork");
 	pthread_mutex_lock(&second->lock);
-	if (philo->sim->active)
-		printf("%li %i has taken a fork\n", timestamp(philo->sim), philo->id);
-	if (philo->sim->active)
-		printf("%li %i has taken a fork\n", timestamp(philo->sim), philo->id);
-	if (philo->sim->active)
-		printf("%li %i is eating\n", timestamp(philo->sim), philo->id);
+	philo_print(philo, "has taken a fork");
+	philo_print(philo, "is eating");
 	philo->last_meal = time_now();
 	time_sleep(philo->sim, philo->sim->eat_time);
 	philo->meal_count++;
@@ -47,9 +44,7 @@ static void	philo_eat(t_philo *philo)
 
 	if (philo->sim->philo_count == 1)
 	{
-		if (philo->sim->active)
-			printf("%li %i has taken a fork\n", timestamp(philo->sim),
-				philo->id);
+		philo_print(philo, "has taken a fork");
 		time_sleep(philo->sim, philo->sim->death_time + 10);
 		return ;
 	}
@@ -66,15 +61,13 @@ static void	philo_eat(t_philo *philo)
 
 static void	philo_sleep(t_philo *philo)
 {
-	if (philo->sim->active)
-		printf("%li %i is sleeping\n", timestamp(philo->sim), philo->id);
+	philo_print(philo, "is sleeping");
 	time_sleep(philo->sim, philo->sim->sleep_time);
 }
 
 static void	philo_think(t_philo *philo)
 {
-	if (philo->sim->active)
-		printf("%li %i is thinking\n", timestamp(philo->sim), philo->id);
+	philo_print(philo, "is thinking");
 }
 
 void	*philo_main(void *arg)
@@ -86,9 +79,12 @@ void	*philo_main(void *arg)
 		return (NULL);
 	while (philo->sim->active)
 	{
-		philo_eat(philo);
-		philo_sleep(philo);
-		philo_think(philo);
+		if (philo->sim->active)
+			philo_eat(philo);
+		if (philo->sim->active)
+			philo_sleep(philo);
+		if (philo->sim->active)
+			philo_think(philo);
 	}
 	return (NULL);
 }
