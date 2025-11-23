@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:14:22 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:20:17 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:29:03 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static void	philo_eat(t_philo *philo)
 		if (philo->sim->active)
 			printf("%li %i has taken a fork\n", timestamp(philo->sim),
 				philo->id);
-		time_sleep(philo->sim, philo->sim->death_time * 2);
+		time_sleep(philo->sim, philo->sim->death_time + 10);
 		return ;
 	}
 	first = philo->right;

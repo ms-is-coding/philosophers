@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:06:32 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:18:39 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:25:07 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ int	sim_init(t_sim *sim)
 	memset(sim->philos, 0, (size_t)sim->philo_count * sizeof(t_philo));
 	memset(sim->forks, 0, (size_t)sim->philo_count * sizeof(t_fork));
 	sim->start_time = time_now();
-	sim->active = false;
 	while (++i < sim->philo_count)
 		if (philo_init(sim, i) != 0)
 			return (sim_cleanup(sim), -1);

@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 19:41:27 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:20:45 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:30:24 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ static void	sim_monitor(t_sim *sim)
 		{
 			if (time_now() - sim->philos[i].last_meal >= sim->death_time)
 			{
-				printf("%li %i died\n", timestamp(sim), i + 1);
 				sim->active = false;
+				printf("%li %i died\n", timestamp(sim), i + 1);
 				return ;
 			}
 		}
@@ -84,12 +84,12 @@ int	main(int argc, char **argv)
 	sim.death_time = philo_atoi(argv[2], 10, 100000, "death_time");
 	sim.eat_time = philo_atoi(argv[3], 10, 100000, "eat_time");
 	sim.sleep_time = philo_atoi(argv[4], 10, 100000, "sleep_time");
-	sim.meal_count = -1;
+	sim.meal_count = 0;
 	if (argc == 6)
 		sim.meal_count = philo_atoi(argv[5], 1, 1000, "meal_count");
 	if (sim.philo_count == -1 || sim.death_time == -1
 		|| sim.eat_time == -1 || sim.sleep_time == -1
-		|| sim_init(&sim))
+		|| sim.meal_count == -1 || sim_init(&sim))
 		return (1);
 	sim_monitor(&sim);
 	sim_cleanup(&sim);
