@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:14:22 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 14:13:28 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:19:16 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static void	philo_eat(t_philo *philo)
 	{
 		first = philo->left;
 		second = philo->right;
-		time_sleep(philo->sim, 1);
+		usleep(100);
 	}
 	philo_eat_meal(philo, first, second);
 }
