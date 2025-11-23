@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mattcarniel <mattcarniel@student.42.fr>    +#+  +:+       +#+         #
+#    By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/02 11:03:00 by smamalig          #+#    #+#              #
-#    Updated: 2025/11/23 02:42:47 by smamalig         ###   ########.fr        #
+#    Updated: 2025/11/23 12:05:34 by smamalig         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
