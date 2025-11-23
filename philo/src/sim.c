@@ -6,70 +6,112 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:06:32 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/22 20:20:45 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 04:36:45 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <stdint.h>
 #include <stdlib.h>
-#include <bits/pthreadtypes.h>
 #include <pthread.h>
-
-int	spawn_thread(t_sim *sim, int i)
-{
-	t_philo	*philo;
-
-	philo = &sim->philos[i];
-	if (pthread_create(&philo->thread, 0, philo_main, philo) == -1)
-	{
-		printf("Philosopher initialization failed\n");
-		return (-1);
-	}
-}
+#include <string.h>
+#include <stdio.h>
 
 void	sim_cleanup(t_sim *sim)
 {
 	int	i;
 
 	i = -1;
+	sim->active = 0;
+	sim->should_end = 1;
 	while (++i < sim->philo_count)
 	{
-		if (sim->philos[i].thread)
+		if (sim->philos[i].started)
 			pthread_join(sim->philos[i].thread, NULL);
 	}
 	i = -1;
 	while (++i < sim->philo_count)
 	{
-		pthread_mutex_destroy(&sim->forks[i].lock);
+		if (sim->forks[i].initialized)
+			pthread_mutex_destroy(&sim->forks[i].lock);
 	}
+	free(sim->philos);
+	free(sim->forks);
+	pthread_mutex_destroy(&sim->main_lock);
+}
+
+static void	assign_forks(t_sim *sim, int i)
+{
+	t_philo	*philo;
+	int		left;
+	int		right;
+
+	philo = &sim->philos[i];
+	left = i % sim->philo_count;
+	right = (i + 1) % sim->philo_count;
+	philo->left = &sim->forks[left];
+	philo->right = &sim->forks[right];
+	philo->pick_left_first = i % 2;
+}
+
+static int	philo_init(t_sim *sim, int i)
+{
+	t_philo	*philo;
+
+	philo = &sim->philos[i];
+	philo->sim = sim;
+	philo->id = i + 1;
+	if (pthread_mutex_init(&sim->forks[i].lock, 0) != 0)
+	{
+		printf("Mutex init failed\n");
+		return (-1);
+	}
+	sim->forks[i].initialized = 1;
+	assign_forks(sim, i);
+	if (pthread_create(&philo->thread, 0, philo_main, philo) != 0)
+	{
+		printf("Thread init failed\n");
+		return (-1);
+	}
+	philo->started = true;
+	return (0);
+}
+
+static int	init_main_locks(t_sim *sim)
+{
+	if (pthread_mutex_init(&sim->main_lock, 0) != 0)
+	{
+		printf("Mutex init failed\n");
+		return (-1);
+	}
+	return (0);
 }
 
 int	sim_init(t_sim *sim)
 {
 	int32_t	i;
 
-	sim->philos = malloc(sim->philo_count * sizeof(t_philo));
-	sim->forks = malloc(sim->philo_count * sizeof(t_fork));
+	sim->philos = malloc((size_t)sim->philo_count * sizeof(t_philo));
+	sim->forks = malloc((size_t)sim->philo_count * sizeof(t_fork));
+	if (!sim->philos || !sim->forks || init_main_locks(sim) == -1)
+	{
+		printf("Memory allocation failed\n");
+		free(sim->philos);
+		free(sim->forks);
+		return (-1);
+	}
 	i = -1;
-	memset(sim->philos, 0, sim->philo_count * sizeof(t_philo));
-	memset(sim->forks, 0, sim->philo_count * sizeof(t_fork));
+	memset(sim->philos, 0, (size_t)sim->philo_count * sizeof(t_philo));
+	memset(sim->forks, 0, (size_t)sim->philo_count * sizeof(t_fork));
 	while (++i < sim->philo_count)
 	{
-		pthread_mutex_init(&sim->forks[i].lock, 0);
-		if (i == 0)
-			sim->philos[i].left = &sim->forks[sim->philo_count - 1];
-		else
-			sim->philos[i].left = &sim->forks[i - 1];
-		if (i == sim->philo_count - 1)
-			sim->philos[i].right = &sim->forks[0];
-		else
-			sim->philos[i].right = &sim->forks[i + 1];
-		if (spawn_thread(sim, i) == -1)
+		if (philo_init(sim, i) != 0)
 		{
 			sim_cleanup(sim);
 			return (-1);
 		}
 	}
+	sim->start_time = time_now();
+	sim->active = 1;
 	return (0);
 }

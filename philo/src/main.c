@@ -6,11 +6,14 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 19:41:27 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/22 20:06:14 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 04:36:16 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 static int32_t	philo_atoi(const char *nptr, int32_t min, int32_t max,
 					const char *name)
@@ -18,7 +21,7 @@ static int32_t	philo_atoi(const char *nptr, int32_t min, int32_t max,
 	int64_t	n;
 
 	n = 0;
-	if (!nptr)
+	if (!nptr || !*nptr)
 		return (-1);
 	while (*nptr)
 	{
@@ -27,14 +30,14 @@ static int32_t	philo_atoi(const char *nptr, int32_t min, int32_t max,
 			printf("Invalid value for %s\n", name);
 			return (-1);
 		}
+		n = n * 10 + *nptr++ - '0';
 		if (n > max)
 		{
 			printf("Value for %s too big. Max %i\n", name, max);
 			return (-1);
 		}
-		n = n * 10 + *nptr++ - '0';
 	}
-	if (n < min || n > max)
+	if (n < min)
 	{
 		printf("Value for %s too small. Min %i\n", name, min);
 		return (-1);
@@ -43,6 +46,29 @@ static int32_t	philo_atoi(const char *nptr, int32_t min, int32_t max,
 }
 
 #define USAGE "<philo_count> <death_time> <eat_time> <sleep_time> [meal_count]"
+
+static void	sim_monitor(t_sim *sim)
+{
+	int	i;
+
+	usleep(10000);
+	while (sim->active)
+	{
+		i = -1;
+		while (++i < sim->philo_count)
+		{
+			if (time_now() - sim->philos[i].last_meal >= sim->death_time)
+			{
+				pthread_mutex_lock(&sim->main_lock);
+				printf("%li %i died\n", timestamp(sim), i + 1);
+				sim->active = false;
+				pthread_mutex_unlock(&sim->main_lock);
+				return ;
+			}
+		}
+		usleep(100);
+	}
+}
 
 int	main(int argc, char **argv)
 {
@@ -55,12 +81,17 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	sim.philo_count = philo_atoi(argv[1], 1, 200, "philo_count");
-	sim.death_time = philo_atoi(argv[2], 1, 100000, "death_time");
-	sim.eat_time = philo_atoi(argv[3], 1, 100000, "eat_time");
-	sim.sleep_time = philo_atoi(argv[4], 1, 100000, "sleep_time");
-	sim.meal_count = philo_atoi(argv[5], 1, 1000, "meal_count");
+	sim.death_time = philo_atoi(argv[2], 10, 100000, "death_time");
+	sim.eat_time = philo_atoi(argv[3], 10, 100000, "eat_time");
+	sim.sleep_time = philo_atoi(argv[4], 10, 100000, "sleep_time");
+	sim.meal_count = -1;
+	if (argc == 6)
+		sim.meal_count = philo_atoi(argv[5], 1, 1000, "meal_count");
 	if (sim.philo_count == -1 || sim.death_time == -1
 		|| sim.eat_time == -1 || sim.sleep_time == -1)
 		return (1);
-	launch_sim(sim);
+	sim_init(&sim);
+	sim_monitor(&sim);
+	sim_cleanup(&sim);
+	return (0);
 }

@@ -6,7 +6,7 @@
 #    By: mattcarniel <mattcarniel@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/02 11:03:00 by smamalig          #+#    #+#              #
-#    Updated: 2025/11/22 20:18:33 by smamalig         ###   ########.fr        #
+#    Updated: 2025/11/23 02:42:47 by smamalig         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,19 +42,11 @@ endif
 ROOT_DIR	:= $(BUILD_DIR)/$(MODE)
 OBJ_DIR		:= $(ROOT_DIR)/obj
 
-SRC_FILES		:= sim.c philo.c main.c
+SRC_FILES		:= sim.c philo.c main.c time.c
 
 SRCS			:= $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 OBJS			:= $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 DEPS			:= $(OBJS:.o=.d)
-
-RED				= \e[31m
-GREEN			= \e[32m
-YELLOW			= \e[33m
-BLUE			= \e[34m
-MAGENTA			= \e[35m
-CYAN			= \e[36m
-RESET			= \e[m
 
 INCLUDES		:= -Iinclude
 
@@ -92,13 +84,12 @@ postbuild:
 	cp -f $(ROOT_DIR)/$(NAME) $(NAME)
 
 
-$(NAME):
-	@make $(ROOT_DIR)/$(NAME) --no-print-directory
+$(NAME): $(ROOT_DIR)/$(NAME)
 
 
 $(ROOT_DIR)/$(NAME): $(OBJS)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $(ROOT_DIR)/$(NAME)
+	$(CC) $(CFLAGS) $(OBJS) -o $(ROOT_DIR)/$(NAME)
 
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
