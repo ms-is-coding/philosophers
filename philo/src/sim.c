@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:06:32 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:25:07 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:15:50 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	sim_cleanup(t_sim *sim)
 	int	i;
 
 	i = -1;
-	sim->active = false;
+	atomic_store(&sim->should_end, true);
+	atomic_store(&sim->active, false);
 	while (++i < sim->philo_count)
 	{
 		if (sim->philos[i].started)
@@ -34,6 +35,7 @@ void	sim_cleanup(t_sim *sim)
 		if (sim->forks[i].initialized)
 			pthread_mutex_destroy(&sim->forks[i].lock);
 	}
+	pthread_mutex_destroy(&sim->io_lock);
 	free(sim->philos);
 	free(sim->forks);
 }
@@ -81,7 +83,7 @@ int	sim_init(t_sim *sim)
 
 	sim->philos = malloc((size_t)sim->philo_count * sizeof(t_philo));
 	sim->forks = malloc((size_t)sim->philo_count * sizeof(t_fork));
-	if (!sim->philos || !sim->forks)
+	if (!sim->philos || !sim->forks || pthread_mutex_init(&sim->io_lock, 0))
 	{
 		printf("Initialization failed\n");
 		free(sim->philos);
@@ -95,6 +97,6 @@ int	sim_init(t_sim *sim)
 	while (++i < sim->philo_count)
 		if (philo_init(sim, i) != 0)
 			return (sim_cleanup(sim), -1);
-	sim->active = true;
+	atomic_store(&sim->active, true);
 	return (0);
 }

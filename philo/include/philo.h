@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 19:41:00 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:46:36 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:13:00 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ typedef struct s_philo
 	t_fork				*left;
 	t_fork				*right;
 	pthread_t			thread;
-	int32_t				meal_count;
+	_Atomic(int32_t)	meal_count;
 	int32_t				id;
 	bool				started;
 	bool				pick_left_first;

@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:14:22 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:48:26 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:13:28 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,15 @@ static void	philo_eat_meal(t_philo *philo, t_fork *first, t_fork *second)
 	pthread_mutex_lock(&second->lock);
 	philo_print(philo, "has taken a fork");
 	philo_print(philo, "is eating");
-	philo->last_meal = time_now();
+	atomic_store(&philo->last_meal, time_now());
 	time_sleep(philo->sim, philo->sim->eat_time);
-	philo->meal_count++;
+	atomic_fetch_add(&philo->meal_count, 1);
 	if (philo->sim->meal_count > 0
-		&& philo->meal_count == philo->sim->meal_count)
+		&& atomic_load(&philo->meal_count) == philo->sim->meal_count)
 	{
-		if (++philo->sim->saturated == philo->sim->philo_count)
-			philo->sim->active = false;
+		if (atomic_fetch_add(&philo->sim->saturated, 1) + 1
+			== philo->sim->philo_count)
+			atomic_store(&philo->sim->active, false);
 	}
 	pthread_mutex_unlock(&second->lock);
 	pthread_mutex_unlock(&first->lock);
@@ -77,13 +78,13 @@ void	*philo_main(void *arg)
 	philo = arg;
 	if (await_active(philo) == -1)
 		return (NULL);
-	while (philo->sim->active)
+	while (atomic_load(&philo->sim->active))
 	{
-		if (philo->sim->active)
+		if (atomic_load(&philo->sim->active))
 			philo_eat(philo);
-		if (philo->sim->active)
+		if (atomic_load(&philo->sim->active))
 			philo_sleep(philo);
-		if (philo->sim->active)
+		if (atomic_load(&philo->sim->active))
 			philo_think(philo);
 	}
 	return (NULL);

@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 19:41:27 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:50:06 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:12:34 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,31 +49,33 @@ static int32_t	philo_atoi(const char *nptr, int32_t min, int32_t max,
 
 static void	sim_monitor(t_sim *sim)
 {
-	int	i;
+	t_philo	*philo;
+	int		i;
 
 	usleep(10000);
+	i = 0;
 	while (1)
 	{
-		if (!sim->active)
+		if (!atomic_load(&sim->active))
 			break ;
-		i = -1;
-		while (++i < sim->philo_count)
+		philo = &sim->philos[i];
+		if (time_now() - atomic_load(&philo->last_meal) >= sim->death_time)
 		{
-			if (time_now() - sim->philos[i].last_meal >= sim->death_time)
-			{
-				sim->active = false;
-				printf("%li %i died\n", timestamp(sim), i + 1);
-				return ;
-			}
+			atomic_store(&philo->sim->active, false);
+			pthread_mutex_lock(&philo->sim->io_lock);
+			printf("%li %i died\n", timestamp(sim), i + 1);
+			pthread_mutex_unlock(&philo->sim->io_lock);
+			return ;
 		}
-		usleep(100);
+		i = (i + 1) % sim->philo_count;
+		usleep(10);
 	}
 }
 
 void	philo_print(t_philo *philo, const char *message)
 {
 	pthread_mutex_lock(&philo->sim->io_lock);
-	if (philo->sim->active)
+	if (atomic_load(&philo->sim->active))
 		printf("%li %i %s\n", timestamp(philo->sim), philo->id, message);
 	pthread_mutex_unlock(&philo->sim->io_lock);
 }

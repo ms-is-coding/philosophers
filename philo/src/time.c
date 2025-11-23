@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 02:42:53 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:49:20 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 13:58:43 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,12 @@ int	await_active(t_philo *philo)
 {
 	while (1)
 	{
-		if (philo->sim->active)
+		if (atomic_load(&philo->sim->active))
 			break ;
-		if (philo->sim->should_end)
+		if (atomic_load(&philo->sim->should_end))
 			return (-1);
 		usleep(10);
 	}
-	philo->last_meal = time_now();
+	atomic_store(&philo->last_meal, time_now());
 	return (0);
 }
