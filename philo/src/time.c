@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 02:42:53 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 13:58:43 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:46:08 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,20 +30,14 @@ int64_t	timestamp(t_sim *sim)
 	return (time_now() - sim->start_time);
 }
 
-void	time_sleep(t_sim *sim, int32_t time_ms)
+void	time_sleep(int32_t time_ms)
 {
 	int64_t	now;
-	int64_t	elapsed;
-	int64_t	tick;
-	int64_t	target;
+	int64_t	start;
 
 	now = time_now();
-	elapsed = now - sim->start_time;
-	tick = elapsed / time_ms;
-	target = sim->start_time + (tick + 1) * time_ms;
-	if (target - now < 1)
-		target += time_ms;
-	while (now < target)
+	start = now;
+	while (now - start < time_ms)
 	{
 		usleep(100);
 		now = time_now();

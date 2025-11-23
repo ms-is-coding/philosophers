@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:14:22 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 14:19:16 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:46:28 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static void	philo_eat_meal(t_philo *philo, t_fork *first, t_fork *second)
 	philo_print(philo, "has taken a fork");
 	philo_print(philo, "is eating");
 	atomic_store(&philo->last_meal, time_now());
-	time_sleep(philo->sim, philo->sim->eat_time);
+	time_sleep(philo->sim->eat_time);
 	atomic_fetch_add(&philo->meal_count, 1);
 	if (philo->sim->meal_count > 0
 		&& atomic_load(&philo->meal_count) == philo->sim->meal_count)
@@ -46,7 +46,7 @@ static void	philo_eat(t_philo *philo)
 	if (philo->sim->philo_count == 1)
 	{
 		philo_print(philo, "has taken a fork");
-		time_sleep(philo->sim, philo->sim->death_time + 10);
+		time_sleep(philo->sim->death_time + 10);
 		return ;
 	}
 	first = philo->right;
@@ -63,7 +63,7 @@ static void	philo_eat(t_philo *philo)
 static void	philo_sleep(t_philo *philo)
 {
 	philo_print(philo, "is sleeping");
-	time_sleep(philo->sim, philo->sim->sleep_time);
+	time_sleep(philo->sim->sleep_time);
 }
 
 static void	philo_think(t_philo *philo)
