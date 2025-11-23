@@ -6,7 +6,7 @@
 #    By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/02 11:03:00 by smamalig          #+#    #+#              #
-#    Updated: 2025/11/23 12:05:34 by smamalig         ###   ########.fr        #
+#    Updated: 2025/11/23 17:05:26 by smamalig         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ CFLAGS_DEBUG	:= -Og -g3 -Wshadow -Wpadded -Wconversion -Wstrict-prototypes \
 					-Wuninitialized -Wdouble-promotion -Wfloat-equal -Wvla \
 					-Wnull-dereference -Wformat=2 -fstack-protector-strong
 CFLAGS_RELEASE	:= -O2 -DNDEBUG -march=native -D__is_42sh
-CFLAGS_SANITIZE	:= -fsanitize=address,undefined
+CFLAGS_SANITIZE	:= -fsanitize=undefined,thread
 
 
 ifeq ($(MODE), release)
