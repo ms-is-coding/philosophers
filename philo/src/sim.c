@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:06:32 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 14:15:50 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/24 12:07:12 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ static void	assign_forks(t_sim *sim, int i)
 	philo->left = &sim->forks[left];
 	philo->right = &sim->forks[right];
 	philo->pick_left_first = i % 2;
+	if (i == sim->philo_count - 1)
+		philo->pick_left_first = true;
 }
 
 static int	philo_init(t_sim *sim, int i)
