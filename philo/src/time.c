@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 02:42:53 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 16:46:08 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/24 13:54:09 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int64_t	timestamp(t_sim *sim)
 	return (time_now() - sim->start_time);
 }
 
-void	time_sleep(int32_t time_ms)
+void	time_sleep(t_sim *sim, int32_t time_ms)
 {
 	int64_t	now;
 	int64_t	start;
@@ -39,6 +39,8 @@ void	time_sleep(int32_t time_ms)
 	start = now;
 	while (now - start < time_ms)
 	{
+		if (!atomic_load(&sim->active))
+			return ;
 		usleep(100);
 		now = time_now();
 	}

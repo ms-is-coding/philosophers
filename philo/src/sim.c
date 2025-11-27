@@ -6,16 +6,18 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:06:32 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/24 12:07:12 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/27 12:23:09 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+#include <stdatomic.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
 void	sim_cleanup(t_sim *sim)
 {
@@ -36,8 +38,6 @@ void	sim_cleanup(t_sim *sim)
 			pthread_mutex_destroy(&sim->forks[i].lock);
 	}
 	pthread_mutex_destroy(&sim->io_lock);
-	free(sim->philos);
-	free(sim->forks);
 }
 
 static void	assign_forks(t_sim *sim, int i)
@@ -51,9 +51,6 @@ static void	assign_forks(t_sim *sim, int i)
 	right = (i + 1) % sim->philo_count;
 	philo->left = &sim->forks[left];
 	philo->right = &sim->forks[right];
-	philo->pick_left_first = i % 2;
-	if (i == sim->philo_count - 1)
-		philo->pick_left_first = true;
 }
 
 static int	philo_init(t_sim *sim, int i)
@@ -63,6 +60,7 @@ static int	philo_init(t_sim *sim, int i)
 	philo = &sim->philos[i];
 	philo->sim = sim;
 	philo->id = i + 1;
+	atomic_store(&sim->forks[i].last_id, -1);
 	if (pthread_mutex_init(&sim->forks[i].lock, 0) != 0)
 	{
 		printf("Mutex init failed\n");
@@ -83,13 +81,9 @@ int	sim_init(t_sim *sim)
 {
 	int32_t	i;
 
-	sim->philos = malloc((size_t)sim->philo_count * sizeof(t_philo));
-	sim->forks = malloc((size_t)sim->philo_count * sizeof(t_fork));
-	if (!sim->philos || !sim->forks || pthread_mutex_init(&sim->io_lock, 0))
+	if (pthread_mutex_init(&sim->io_lock, 0))
 	{
-		printf("Initialization failed\n");
-		free(sim->philos);
-		free(sim->forks);
+		printf("I/O mutex init failed\n");
 		return (-1);
 	}
 	i = -1;

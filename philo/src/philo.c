@@ -6,7 +6,7 @@
 /*   By: smamalig <smamalig@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:14:22 by smamalig          #+#    #+#             */
-/*   Updated: 2025/11/23 16:46:28 by smamalig         ###   ########.fr       */
+/*   Updated: 2025/11/27 12:26:34 by smamalig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,16 @@
 
 static void	philo_eat_meal(t_philo *philo, t_fork *first, t_fork *second)
 {
+	while (atomic_load(&first->last_id) == philo->id
+		|| atomic_load(&second->last_id) == philo->id)
+		usleep(100);
 	pthread_mutex_lock(&first->lock);
 	philo_print(philo, "has taken a fork");
 	pthread_mutex_lock(&second->lock);
 	philo_print(philo, "has taken a fork");
 	philo_print(philo, "is eating");
 	atomic_store(&philo->last_meal, time_now());
-	time_sleep(philo->sim->eat_time);
+	time_sleep(philo->sim, philo->sim->eat_time);
 	atomic_fetch_add(&philo->meal_count, 1);
 	if (philo->sim->meal_count > 0
 		&& atomic_load(&philo->meal_count) == philo->sim->meal_count)
@@ -34,8 +37,10 @@ static void	philo_eat_meal(t_philo *philo, t_fork *first, t_fork *second)
 			== philo->sim->philo_count)
 			atomic_store(&philo->sim->active, false);
 	}
-	pthread_mutex_unlock(&second->lock);
 	pthread_mutex_unlock(&first->lock);
+	pthread_mutex_unlock(&second->lock);
+	atomic_store(&first->last_id, philo->id);
+	atomic_store(&second->last_id, philo->id);
 }
 
 static void	philo_eat(t_philo *philo)
@@ -46,16 +51,15 @@ static void	philo_eat(t_philo *philo)
 	if (philo->sim->philo_count == 1)
 	{
 		philo_print(philo, "has taken a fork");
-		time_sleep(philo->sim->death_time + 10);
+		time_sleep(philo->sim, philo->sim->death_time + 10);
 		return ;
 	}
-	first = philo->right;
-	second = philo->left;
-	if (philo->pick_left_first)
+	first = philo->left;
+	second = philo->right;
+	if (philo->id == philo->sim->philo_count)
 	{
-		first = philo->left;
-		second = philo->right;
-		usleep(100);
+		first = philo->right;
+		second = philo->left;
 	}
 	philo_eat_meal(philo, first, second);
 }
@@ -63,7 +67,7 @@ static void	philo_eat(t_philo *philo)
 static void	philo_sleep(t_philo *philo)
 {
 	philo_print(philo, "is sleeping");
-	time_sleep(philo->sim->sleep_time);
+	time_sleep(philo->sim, philo->sim->sleep_time);
 }
 
 static void	philo_think(t_philo *philo)
@@ -78,6 +82,8 @@ void	*philo_main(void *arg)
 	philo = arg;
 	if (await_active(philo) == -1)
 		return (NULL);
+	if (philo->id % 2)
+		philo_sleep(philo);
 	while (atomic_load(&philo->sim->active))
 	{
 		if (atomic_load(&philo->sim->active))
